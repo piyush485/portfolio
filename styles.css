@@ -106,6 +106,77 @@ body {
   background-attachment: fixed;
 }
 
+/* Quiet, animated data streams tie the page background to the hero cover. */
+.data-ambient {
+  position: fixed;
+  inset: 76px 0 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.62;
+  color: var(--db-cyan);
+}
+.data-ambient svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.data-stream {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.data-stream-base { opacity: 0.24; }
+.data-stream-flow {
+  stroke-width: 2.4;
+  stroke-dasharray: 7 24;
+  stroke-linecap: round;
+  opacity: 0.78;
+  animation: data-stream-travel 48s linear infinite;
+}
+.data-stream-amber,
+.data-node-amber { color: var(--db-amber); }
+.data-node {
+  fill: currentColor;
+  opacity: 0.62;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: data-node-pulse 4.2s ease-in-out infinite;
+}
+.data-node-delay { animation-delay: -2.1s; }
+.motion-paused .data-stream-flow,
+.motion-paused .data-node { animation-play-state: paused; }
+@keyframes data-stream-travel {
+  to { stroke-dashoffset: -640; }
+}
+@keyframes data-node-pulse {
+  0%, 100% { opacity: 0.28; transform: scale(0.75); }
+  50% { opacity: 0.8; transform: scale(1.35); }
+}
+[data-theme="dark"] .data-ambient { opacity: 0.48; }
+
+/* Each portfolio mode keeps the same facts but changes its first-pass focus. */
+[data-mode="recruiter"] [data-mode-copy="dev"],
+[data-mode="dev"] [data-mode-copy="recruiter"] {
+  display: none !important;
+}
+[data-mode="recruiter"] #heroLinkedIn { order: 1; }
+[data-mode="recruiter"] #heroProjects { order: 2; }
+[data-mode="recruiter"] #heroNotebook { order: 3; }
+[data-mode="dev"] #heroNotebook { order: 1; }
+[data-mode="dev"] #heroProjects { order: 2; }
+[data-mode="dev"] #heroLinkedIn { order: 3; }
+
+@media (prefers-reduced-motion: reduce) {
+  .data-stream-flow,
+  .data-node {
+    animation: none;
+  }
+  .motion-toggle-btn { display: none !important; }
+}
+
 /* Text Justification across Body Paragraphs, Lists & Descriptions */
 p, li, .hero-subtitle, .section-desc, .drawer-desc, .skill-desc, .project-desc, .project-impact, .dag-node-sub, .modal-box p, .modal-box li {
   text-align: justify;
@@ -408,6 +479,32 @@ button {
   object-fit: cover;
   object-position: center 52%;
 }
+.hero-cover picture { display: block; width: 100%; height: 100%; }
+.motion-toggle-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(9, 14, 23, 0.78);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.motion-toggle-btn:hover,
+.motion-toggle-btn:focus-visible {
+  background: rgba(9, 14, 23, 0.96);
+  border-color: #fff;
+}
+.motion-toggle-btn:focus-visible { outline: 2px solid var(--db-cyan); outline-offset: 3px; }
+.motion-toggle-btn[hidden] { display: none !important; }
 .hero-avatar {
   position: relative;
   width: 124px;
@@ -1105,29 +1202,18 @@ button {
   transform: translateY(-4px);
 }
 .skill-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  display: block;
 }
 .skill-name {
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--db-text-main);
 }
-.skill-bar-bg {
+.skill-divider {
   width: 100%;
-  height: 6px;
-  background: var(--db-navy-700);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-.skill-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--db-lava) 0%, #FF7A00 100%);
-  border-radius: 3px;
-  transition: width 1s ease-in-out;
+  height: 2px;
+  background: var(--db-lava);
+  margin: 12px 0;
 }
 .skill-desc {
   font-size: 0.82rem;
@@ -1159,6 +1245,50 @@ button {
   box-shadow: var(--shadow-glow);
   transform: translateY(-6px);
 }
+.project-pattern-label {
+  color: var(--db-cyan);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin: -4px 0 8px;
+}
+.project-evidence,
+.case-study-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 18px;
+}
+.evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--db-border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--db-text-muted);
+  background: color-mix(in srgb, var(--db-card-bg) 76%, var(--db-cyan));
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.project-patterns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+.project-pattern {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 1px solid var(--db-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--db-card-bg) 78%, transparent);
+  box-shadow: var(--db-shadow);
+}
+.project-pattern span { color: var(--db-lava); font: 700 0.75rem/1 var(--font-code); }
+.project-pattern strong { font-size: 1rem; line-height: 1.4; }
 .project-cat {
   font-size: 0.8rem;
   font-family: var(--font-code);
@@ -1479,6 +1609,48 @@ button {
   text-align: justify;
   text-justify: inter-word;
 }
+.case-study-category { margin-bottom: 12px; }
+.case-study-pattern { color: var(--db-cyan); font: 600 0.82rem/1.4 var(--font-code); margin-bottom: 8px; }
+.case-study-title { font-size: 1.8rem; line-height: 1.25; margin: 0 42px 20px 0; }
+.case-study-outcome {
+  padding: 16px 18px;
+  margin-bottom: 22px;
+  border-left: 3px solid var(--db-emerald);
+  border-radius: var(--radius-sm);
+  background: var(--db-navy-700);
+}
+.case-study-outcome > span {
+  display: block;
+  color: var(--db-emerald);
+  font: 700 0.72rem/1.2 var(--font-code);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.case-study-outcome p { margin: 0; color: var(--db-text-main); font-weight: 600; }
+.case-study-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+.case-study-block { padding: 16px; border: 1px solid var(--db-border); border-radius: var(--radius-md); }
+.case-study-block h3 { font-size: 0.95rem; margin-bottom: 8px; }
+.case-study-block p { color: var(--db-text-muted); margin: 0; font-size: 0.9rem; }
+.case-study-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 24px; }
+.case-study-metric { padding: 13px; border-radius: var(--radius-sm); background: var(--db-navy-700); }
+.case-study-metric span { display: block; color: var(--db-text-dim); font-size: 0.75rem; margin-bottom: 5px; }
+.case-study-metric strong { color: var(--db-text-main); font-size: 0.95rem; }
+.case-study-section-title { font-size: 1.05rem; margin: 24px 0 12px; }
+.case-study-architecture { padding-left: 22px; color: var(--db-text-muted); margin-bottom: 22px; line-height: 1.75; }
+.case-study-architecture li { padding-left: 4px; margin-bottom: 5px; }
+.case-study-code {
+  background: #060B12;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--db-border);
+  font: 0.82rem/1.6 var(--font-code);
+  color: #E2E8F0;
+  overflow: auto;
+  margin-bottom: 16px;
+}
+.case-study-evidence { margin: 0 0 10px; }
+.case-study-evidence p { flex-basis: 100%; color: var(--db-text-dim); font-size: 0.8rem; margin: 2px 0 0; }
 .modal-close {
   position: absolute;
   top: 20px;
@@ -1606,5 +1778,12 @@ p, li, .hero-subtitle, .section-desc, .drawer-desc, .skill-desc,
     height: 140px;
     margin-bottom: -76px;
   }
+  .project-patterns { grid-template-columns: 1fr; gap: 8px; }
+  .project-pattern { min-height: 64px; }
+  .case-study-title { font-size: 1.45rem; margin-right: 30px; }
+  .case-study-summary { grid-template-columns: 1fr; }
+  .case-study-metrics { grid-template-columns: 1fr; }
+  .case-study-metric { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .case-study-metric span { margin: 0; }
   .hero-profile-row { gap: 14px; }
 }

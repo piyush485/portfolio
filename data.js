@@ -26,23 +26,23 @@ const PORTFOLIO_DATA = {
 
   skills: [
     // Databricks & Spark Core
-    { name: "Databricks Lakehouse", category: "core", level: 96, icon: "cpu", desc: "Unity Catalog, Delta Lake, Auto Loader, Medallion Architecture, DBX Jobs" },
-    { name: "PySpark & Spark API", category: "core", level: 94, icon: "zap", desc: "Structured Streaming, DataFrame API, Performance Tuning, 50M+ Records Transformation" },
-    { name: "Advanced SQL & Delta Lake", category: "core", level: 95, icon: "database", desc: "SCD Type 1 & Type 2 Modeling, CTEs, Window Functions, Databricks SQL" },
-    { name: "Apache Airflow", category: "orchestration", level: 90, icon: "git-branch", desc: "DAG Design, Automated Scheduling, SLA Alarms, AI/ML Workflows (-40% manual intervention)" },
+    { name: "Databricks Lakehouse", category: "core", icon: "cpu", desc: "Unity Catalog, Delta Lake, Auto Loader, Medallion Architecture, DBX Jobs" },
+    { name: "PySpark & Spark API", category: "core", icon: "zap", desc: "Structured Streaming, DataFrame API, Performance Tuning, 50M+ Records Transformation" },
+    { name: "Advanced SQL & Delta Lake", category: "core", icon: "database", desc: "SCD Type 1 & Type 2 Modeling, CTEs, Window Functions, Databricks SQL" },
+    { name: "Apache Airflow", category: "orchestration", icon: "git-branch", desc: "DAG Design, Automated Scheduling, SLA Alarms, AI/ML Workflows (-40% manual intervention)" },
 
     // AWS Cloud Services
-    { name: "AWS S3 & Storage", category: "aws", level: 92, icon: "hard-drive", desc: "Partitioning Strategies, Storage Optimization (-15% cost), Event Notifications" },
-    { name: "AWS Glue & EMR", category: "aws", level: 88, icon: "layers", desc: "Glue Data Catalog, Crawlers, ETL Jobs, Transient EMR Spark Clusters" },
-    { name: "AWS Lambda & Step Functions", category: "aws", level: 86, icon: "code", desc: "Event-driven Pipeline Triggers, Serverless Data Transformers" },
+    { name: "AWS S3 & Storage", category: "aws", icon: "hard-drive", desc: "Partitioning Strategies, Storage Optimization (-15% cost), Event Notifications" },
+    { name: "AWS Glue & EMR", category: "aws", icon: "layers", desc: "Glue Data Catalog, Crawlers, ETL Jobs, Transient EMR Spark Clusters" },
+    { name: "AWS Lambda & Step Functions", category: "aws", icon: "code", desc: "Event-driven Pipeline Triggers, Serverless Data Transformers" },
 
     // Azure Cloud Services
-    { name: "Azure Data Factory (ADF)", category: "azure", level: 92, icon: "workflow", desc: "Orchestrating Azure Databricks Workflows, Copy Data Pipelines, Self-Hosted IR" },
-    { name: "Azure ADLS Gen2", category: "azure", level: 90, icon: "folder-tree", desc: "Hierarchical Namespaces, Access Control Lists (ACLs), Delta Table Storage" },
+    { name: "Azure Data Factory (ADF)", category: "azure", icon: "workflow", desc: "Orchestrating Azure Databricks Workflows, Copy Data Pipelines, Self-Hosted IR" },
+    { name: "Azure ADLS Gen2", category: "azure", icon: "folder-tree", desc: "Hierarchical Namespaces, Access Control Lists (ACLs), Delta Table Storage" },
 
     // Databases & DevOps
-    { name: "Relational & NoSQL DBs", category: "orchestration", level: 88, icon: "server", desc: "MySQL, Oracle, MongoDB, Azure SQL" },
-    { name: "DevOps & CI/CD", category: "orchestration", level: 90, icon: "git-commit", desc: "Git, GitHub Actions, CI/CD Pipeline Automation, Linux Scripting" }
+    { name: "Relational & NoSQL DBs", category: "orchestration", icon: "server", desc: "MySQL, Oracle, MongoDB, Azure SQL" },
+    { name: "DevOps & CI/CD", category: "orchestration", icon: "git-commit", desc: "Git, GitHub Actions, CI/CD Pipeline Automation, Linux Scripting" }
   ],
 
   projects: [
@@ -51,6 +51,9 @@ const PORTFOLIO_DATA = {
       title: "Event-Driven Data Ingestion Pipeline on AWS & Databricks",
       subtitle: "Automated event-driven ingestion engine using Databricks Auto Loader & Medallion Architecture",
       category: "AWS & Databricks",
+      pattern: "Event-driven ingestion",
+      problem: "Incoming files needed reliable ingestion even as file schemas changed over time.",
+      contribution: "Implemented S3 event-triggered ingestion with Databricks Auto Loader, schema evolution, PySpark transformations, and Bronze, Silver, and Gold layers.",
       impact: "Streamlined automated ingestion of incoming file streams with zero data loss and automated schema evolution.",
       tags: ["Databricks", "Auto Loader", "PySpark", "SQL", "AWS S3", "Delta Lake", "Medallion"],
       description: "Designed an automated event-driven ingestion pipeline on AWS and Databricks. Implemented Databricks Auto Loader with schema evolution to process incoming CSV streams using PySpark and SQL. Built multi-stage transformation pipelines using Medallion Architecture (Bronze ➔ Silver ➔ Gold) in Databricks Lakehouse to deliver analytics-ready datasets.",
@@ -92,6 +95,9 @@ query = (streaming_df.writeStream
       title: "Azure Databricks & ADF Enterprise ETL (50M+ Records & SCD Type 1/2)",
       subtitle: "Enterprise data governance & pipeline orchestration across Azure Databricks & ADLS",
       category: "Deloitte - Azure & Databricks",
+      pattern: "Historical data modeling",
+      problem: "Enterprise data needed large-scale processing, governed access, and accurate customer history across an Azure lakehouse.",
+      contribution: "Developed PySpark and SQL transformations for 50M+ records, implemented SCD Type 1 and Type 2 in Unity Catalog, and orchestrated jobs with Azure Data Factory.",
       impact: "Processed 50M+ records while implementing SCD Type 1 and Type 2 historical data modeling in Unity Catalog.",
       tags: ["Deloitte", "Azure Databricks", "Azure ADF", "ADLS Gen2", "Unity Catalog", "SCD Type 1/2", "PySpark"],
       description: "Analyzed business requirements and developed complex transformation logic using PySpark and SQL on Azure Databricks at Deloitte. Managed Unity Catalog objects and implemented SCD Type 1 and Type 2 logic to maintain accurate historical data. Designed Azure Data Factory (ADF) pipelines to orchestrate Databricks jobs across ADLS Gen2.",
@@ -122,6 +128,9 @@ WHEN NOT MATCHED THEN
       title: "AWS & Databricks Pipeline Performance & Storage Cost Optimizer",
       subtitle: "Spark UI job tuning, S3 partitioning optimization, and Airflow workflow automation",
       category: "Genpact - AWS & Airflow",
+      pattern: "Performance & cost optimization",
+      problem: "Data workflows needed less manual intervention, lower S3 storage costs, and faster Spark processing.",
+      contribution: "Automated scheduling and alerts with Airflow, tuned Spark jobs, and improved S3 partitioning strategies.",
       impact: "Reduced manual pipeline intervention by 40%, lowered AWS S3 storage costs by 15%, and sped up data processing by 30%.",
       tags: ["Genpact", "Databricks", "PySpark", "Airflow", "AWS S3", "CI/CD", "GitHub"],
       description: "Architected and optimized production data pipelines at Genpact utilizing Databricks, PySpark, Python, SQL, Airflow, and AWS. Automated pipeline scheduling and alerts using Airflow DAGs and AI/ML workflows (-40% manual intervention). Engineered S3 storage partitioning strategies (-15% storage cost) and tuned Spark jobs for 30% faster data processing.",

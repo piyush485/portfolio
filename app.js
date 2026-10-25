@@ -13,7 +13,30 @@ document.addEventListener('DOMContentLoaded', () => {
      0. Portfolio Mode Switcher (Dev / Recruiter)
   ------------------------------------------------------------- */
   const themeToggle = document.getElementById('themeToggle');
+  const motionToggle = document.getElementById('motionToggle');
   const htmlEl = document.documentElement;
+
+  function arrangePortfolioMode(mode) {
+    htmlEl.setAttribute('data-mode', mode);
+
+    const sectionOrder = mode === 'recruiter'
+      ? ['experience', 'projects', 'skills', 'notebook', 'architecture', 'terminal']
+      : ['notebook', 'architecture', 'projects', 'skills', 'experience', 'terminal'];
+    const footer = document.querySelector('.footer');
+    sectionOrder.forEach((sectionId) => {
+      const section = document.getElementById(sectionId);
+      if (section && footer) footer.before(section);
+    });
+
+    const navOrder = mode === 'recruiter'
+      ? ['experience', 'projects', 'skills', 'notebook', 'architecture']
+      : ['notebook', 'architecture', 'projects', 'skills', 'experience'];
+    const navList = document.querySelector('.nav-links');
+    navOrder.forEach((sectionId) => {
+      const link = navList?.querySelector(`[data-section-link="${sectionId}"]`);
+      if (link) navList.append(link.closest('li'));
+    });
+  }
 
   // Dev mode uses the dark theme; Recruiter mode uses the light theme.
   const savedTheme = localStorage.getItem('databricks_theme') || 'light';
@@ -22,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyTheme(theme) {
     htmlEl.setAttribute('data-theme', theme);
     localStorage.setItem('databricks_theme', theme);
+    arrangePortfolioMode(theme === 'dark' ? 'dev' : 'recruiter');
 
     if (theme === 'dark') {
       themeToggle.innerHTML = `<i data-lucide="code-2"></i> <span>Dev Mode</span>`;
@@ -40,6 +64,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     applyTheme(newTheme);
   });
+
+  if (motionToggle) {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) motionToggle.hidden = true;
+
+    motionToggle.addEventListener('click', () => {
+      const isPaused = document.body.classList.toggle('motion-paused');
+      motionToggle.setAttribute('aria-pressed', String(isPaused));
+      motionToggle.setAttribute('aria-label', `${isPaused ? 'Resume' : 'Pause'} background motion`);
+      motionToggle.title = `${isPaused ? 'Resume' : 'Pause'} background motion`;
+      motionToggle.innerHTML = `<i data-lucide="${isPaused ? 'play' : 'pause'}"></i><span>${isPaused ? 'Resume motion' : 'Pause motion'}</span>`;
+      lucide.createIcons();
+    });
+  }
 
   /* -------------------------------------------------------------
      1. Notebook Playground Controller
@@ -309,11 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="skill-card">
         <div class="skill-header">
           <span class="skill-name">${skill.name}</span>
-          <span class="badge badge-lava">${skill.level}%</span>
         </div>
-        <div class="skill-bar-bg">
-          <div class="skill-bar-fill" style="width: ${skill.level}%;"></div>
-        </div>
+        <div class="skill-divider" aria-hidden="true"></div>
         <div class="skill-desc">${skill.desc}</div>
       </div>
     `).join('');
@@ -334,21 +369,32 @@ document.addEventListener('DOMContentLoaded', () => {
      4. Featured Projects Controller
   ------------------------------------------------------------- */
   const projectsGrid = document.getElementById('projectsGrid');
+  const escapeHtml = (value) => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
   function renderProjects() {
     projectsGrid.innerHTML = projects.map(proj => `
       <div class="project-card">
         <div>
           <div class="project-cat">${proj.category}</div>
+          <div class="project-pattern-label">${proj.pattern}</div>
           <h3 class="project-title">${proj.title}</h3>
           <div class="project-impact">${proj.impact}</div>
           <p class="project-desc">${proj.subtitle}</p>
+          <div class="project-evidence" aria-label="Project materials">
+            <span class="evidence-badge">Architecture walkthrough</span>
+            <span class="evidence-badge">Representative code sample</span>
+          </div>
           <div class="project-tags">
             ${proj.tags.map(t => `<span class="tag">${t}</span>`).join('')}
           </div>
         </div>
         <button class="btn-secondary btn-view-project" data-id="${proj.id}" style="width: 100%; justify-content: center; margin-top: 16px;">
-          <i data-lucide="eye"></i> View Full Architecture & Code
+          <i data-lucide="eye"></i>
+          <span data-mode-copy="recruiter">View Project Outcomes</span>
+          <span data-mode-copy="dev">View Architecture & Code</span>
         </button>
       </div>
     `).join('');
@@ -518,18 +564,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const proj = projects.find(p => p.id === projId);
       if (proj) {
         openModal(`
-          <span class="badge badge-lava" style="margin-bottom: 12px;">${proj.category}</span>
-          <h2 style="font-size: 1.8rem; margin-bottom: 8px;">${proj.title}</h2>
-          <p style="color: var(--db-emerald); font-weight: 600; margin-bottom: 16px;">${proj.impact}</p>
-          <p style="color: var(--db-text-muted); margin-bottom: 24px;">${proj.description}</p>
+          <span class="badge badge-lava case-study-category">${proj.category}</span>
+          <p class="case-study-pattern">${proj.pattern}</p>
+          <h2 class="case-study-title">${proj.title}</h2>
+          <div class="case-study-outcome"><span>Outcome</span><p>${proj.impact}</p></div>
 
-          <h4 style="font-size: 1.1rem; margin-bottom: 12px;" class="text-lava">Architecture Workflow</h4>
-          <ol style="padding-left: 20px; color: var(--db-text-muted); margin-bottom: 24px; line-height: 1.8;">
-            ${proj.architecture.map(step => `<li>${step}</li>`).join('')}
-          </ol>
+          <div class="case-study-summary">
+            <section class="case-study-block">
+              <h3>The challenge</h3>
+              <p>${proj.problem}</p>
+            </section>
+            <section class="case-study-block">
+              <h3>Approach and contribution</h3>
+              <p>${proj.contribution}</p>
+            </section>
+          </div>
 
-          <h4 style="font-size: 1.1rem; margin-bottom: 12px;" class="text-cyan">Production Code Snippet</h4>
-          <pre style="background: #060B12; padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--db-border); font-family: var(--font-code); font-size: 0.85rem; color: #E2E8F0; overflow-x: auto; margin-bottom: 20px;"><code>${proj.codeSnippet}</code></pre>
+          <div class="case-study-metrics" aria-label="Project details">
+            ${proj.metrics.map(metric => `<div class="case-study-metric"><span>${metric.label}</span><strong>${metric.value}</strong></div>`).join('')}
+          </div>
+
+          <h3 class="case-study-section-title text-lava">Architecture walkthrough</h3>
+          <ol class="case-study-architecture">${proj.architecture.map(step => `<li>${step}</li>`).join('')}</ol>
+
+          <h3 class="case-study-section-title text-cyan">Representative code sample</h3>
+          <pre class="case-study-code"><code>${escapeHtml(proj.codeSnippet)}</code></pre>
+
+          <div class="case-study-evidence">
+            <span class="evidence-badge">Architecture walkthrough</span>
+            <span class="evidence-badge">Representative code sample</span>
+            <p>The interactive notebook uses sample data and is not connected to production systems.</p>
+          </div>
         `);
       }
     }

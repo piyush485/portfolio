@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-mode="recruiter">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,6 +37,21 @@
     </svg>
   </div>
 
+  <div class="data-ambient" aria-hidden="true">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="none" focusable="false">
+      <path class="data-stream data-stream-base" d="M-80 190 C150 90 260 320 500 245 S850 100 1040 190 1330 90 1520 185" />
+      <path class="data-stream data-stream-flow data-stream-cyan" d="M-80 190 C150 90 260 320 500 245 S850 100 1040 190 1330 90 1520 185" />
+      <path class="data-stream data-stream-base" d="M-100 650 C130 560 330 790 560 680 S900 530 1100 660 1360 560 1530 640" />
+      <path class="data-stream data-stream-flow data-stream-amber" d="M-100 650 C130 560 330 790 560 680 S900 530 1100 660 1360 560 1530 640" />
+      <path class="data-stream data-stream-base" d="M90 -60 C190 100 10 300 130 430 S260 710 150 960" />
+      <path class="data-stream data-stream-flow data-stream-cyan" d="M90 -60 C190 100 10 300 130 430 S260 710 150 960" />
+      <circle class="data-node" cx="500" cy="245" r="4" />
+      <circle class="data-node data-node-delay" cx="1040" cy="190" r="4" />
+      <circle class="data-node data-node-amber" cx="560" cy="680" r="4" />
+      <circle class="data-node data-node-delay data-node-amber" cx="1100" cy="660" r="4" />
+    </svg>
+  </div>
+
   <!-- Streamlined Top Navigation Header -->
   <header class="navbar">
     <div class="container nav-content">
@@ -49,11 +64,11 @@
 
       <nav>
         <ul class="nav-links">
-          <li><a href="#notebook">Playground</a></li>
-          <li><a href="#architecture">Architecture</a></li>
-          <li><a href="#skills">Skills</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#experience">Career</a></li>
+          <li><a href="#notebook" data-section-link="notebook">Playground</a></li>
+          <li><a href="#architecture" data-section-link="architecture">Architecture</a></li>
+          <li><a href="#skills" data-section-link="skills">Skills</a></li>
+          <li><a href="#projects" data-section-link="projects">Projects</a></li>
+          <li><a href="#experience" data-section-link="experience">Career</a></li>
         </ul>
       </nav>
 
@@ -73,8 +88,14 @@
   <!-- Hero Section -->
   <section id="hero" class="hero">
     <div class="container hero-grid">
-      <div class="hero-cover" aria-label="Data analytics cover image">
-        <img src="Cover-photo.jpg" alt="Data analytics charts and global data network">
+      <div class="hero-cover" aria-label="Data engineering cover image">
+        <picture>
+          <source media="(max-width: 640px)" srcset="Cover-photo-portfolio-mobile.jpg">
+          <img src="Cover-photo-portfolio-optimized.jpg" alt="Illustrated cloud data lakehouse pipeline with flowing data streams and layered tables" width="2172" height="724" fetchpriority="high">
+        </picture>
+        <button class="motion-toggle-btn" id="motionToggle" type="button" aria-pressed="false" aria-label="Pause background motion" title="Pause background motion">
+          <i data-lucide="pause"></i><span id="motionToggleText">Pause motion</span>
+        </button>
       </div>
       <div class="hero-text-content">
         <!-- Profile Avatar & Social Links Row -->
@@ -105,7 +126,8 @@
         <h2 class="hero-role">
           <span class="text-lava">Data Engineer</span> at <span class="hero-company">Deloitte</span>
         </h2>
-        <p class="hero-headline">Building scalable Databricks Lakehouses with PySpark, AWS & Azure</p>
+        <p class="hero-headline" data-mode-copy="recruiter">Delivering reliable data pipelines across cloud platforms</p>
+        <p class="hero-headline" data-mode-copy="dev">Building scalable Databricks Lakehouses with PySpark, AWS & Azure</p>
 
         <div class="hero-tag">
           <span class="cluster-status">
@@ -117,19 +139,22 @@
           </span>
         </div>
         
-        <p class="hero-subtitle">
-          Data Engineer with <strong>around 3 years of experience</strong> specializing in <strong>Databricks Lakehouse, PySpark, SQL, Unity Catalog, and Apache Airflow</strong>. Proven track record of transforming <strong>50M+ records</strong> across <strong>Azure (ADF, ADLS Gen2)</strong> and <strong>AWS (S3, Glue, EMR, Lambda)</strong>.
+        <p class="hero-subtitle" data-mode-copy="recruiter">
+          Data Engineer with <strong>around 3 years of experience</strong> at Deloitte and Genpact, processing <strong>50M+ records</strong> and delivering a <strong>40% automation boost</strong> across cloud data projects.
+        </p>
+        <p class="hero-subtitle" data-mode-copy="dev">
+          Building production lakehouse pipelines with <strong>Databricks, PySpark, SQL, Delta Lake, and Unity Catalog</strong>, orchestrated across <strong>AWS and Azure</strong> with Airflow and ADF.
         </p>
         
         <div class="hero-actions">
-          <a href="https://www.linkedin.com/in/piyush-pandey-91b2831b4/" target="_blank" rel="noopener noreferrer" class="btn-linkedin-hero">
+          <a id="heroLinkedIn" href="https://www.linkedin.com/in/piyush-pandey-91b2831b4/" target="_blank" rel="noopener noreferrer" class="btn-linkedin-hero">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             Connect on LinkedIn
           </a>
-          <a href="#notebook" class="btn-primary">
+          <a id="heroNotebook" href="#notebook" class="btn-primary">
             <i data-lucide="play-circle"></i> Run Live Notebook
           </a>
-          <a href="#projects" class="btn-secondary">
+          <a id="heroProjects" href="#projects" class="btn-secondary">
             <i data-lucide="folder-git-2"></i> Explore Projects
           </a>
         </div>
@@ -331,9 +356,17 @@
       <div class="section-header">
         <span class="section-tag">// Engineering Milestones</span>
         <h2 class="section-title">Featured Production Data Projects</h2>
-        <p class="section-desc">
+        <p class="section-desc" data-mode-copy="recruiter">
+          Selected data projects with clear business outcomes, scale, and measurable improvements.
+        </p>
+        <p class="section-desc" data-mode-copy="dev">
           Real-world data pipeline implementations delivering high throughput, low latency, and cost efficiency.
         </p>
+        <div class="project-patterns" aria-label="Project patterns covered">
+          <div class="project-pattern"><span>01</span><strong>Event-driven ingestion</strong></div>
+          <div class="project-pattern"><span>02</span><strong>Historical data modeling</strong></div>
+          <div class="project-pattern"><span>03</span><strong>Performance and cost optimization</strong></div>
+        </div>
       </div>
 
       <div class="projects-grid" id="projectsGrid">
@@ -348,7 +381,10 @@
       <div class="section-header">
         <span class="section-tag">// Career Track</span>
         <h2 class="section-title">Work Experience & Career Journey</h2>
-        <p class="section-desc">
+        <p class="section-desc" data-mode-copy="recruiter">
+          Career progression and key contributions across Deloitte and Genpact.
+        </p>
+        <p class="section-desc" data-mode-copy="dev">
           Professional achievements and technical responsibilities at Deloitte and Genpact.
         </p>
       </div>
