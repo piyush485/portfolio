@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
      0. Portfolio Mode Switcher (Dev / Recruiter)
   ------------------------------------------------------------- */
   const themeToggle = document.getElementById('themeToggle');
-  const motionToggle = document.getElementById('motionToggle');
   const htmlEl = document.documentElement;
 
   function arrangePortfolioMode(mode) {
@@ -64,20 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     applyTheme(newTheme);
   });
-
-  if (motionToggle) {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) motionToggle.hidden = true;
-
-    motionToggle.addEventListener('click', () => {
-      const isPaused = document.body.classList.toggle('motion-paused');
-      motionToggle.setAttribute('aria-pressed', String(isPaused));
-      motionToggle.setAttribute('aria-label', `${isPaused ? 'Resume' : 'Pause'} background motion`);
-      motionToggle.title = `${isPaused ? 'Resume' : 'Pause'} background motion`;
-      motionToggle.innerHTML = `<i data-lucide="${isPaused ? 'play' : 'pause'}"></i><span>${isPaused ? 'Resume motion' : 'Pause motion'}</span>`;
-      lucide.createIcons();
-    });
-  }
 
   /* -------------------------------------------------------------
      1. Notebook Playground Controller
