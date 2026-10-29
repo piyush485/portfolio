@@ -1,6 +1,167 @@
 // Databricks Portfolio Application Controller - app.js
 
 document.addEventListener('DOMContentLoaded', () => {
+  // A quiet center-page dot field that ripples away from the pointer.
+  const dotCanvas = document.getElementById('cursorDotField');
+  if (dotCanvas) {
+    const dotContext = dotCanvas.getContext('2d');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const dotSpacing = 22;
+    let dots = [];
+    let width = 0;
+    let height = 0;
+    let pointerX = -1000;
+    let pointerY = -1000;
+    let framePending = false;
+
+    function resizeDotField() {
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      dotCanvas.width = Math.round(width * pixelRatio);
+      dotCanvas.height = Math.round(height * pixelRatio);
+      dotContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      dots = [];
+      for (let y = dotSpacing / 2; y < height; y += dotSpacing) {
+        for (let x = dotSpacing / 2; x < width; x += dotSpacing) {
+          dots.push({ x, y, offsetX: 0, offsetY: 0 });
+        }
+      }
+      drawDotField();
+    }
+
+    function drawDotField() {
+      framePending = false;
+      dotContext.clearRect(0, 0, width, height);
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radiusX = width * 0.9;
+      const radiusY = height * 0.9;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      let stillMoving = false;
+
+      dots.forEach((dot) => {
+        const normalizedX = (dot.x - centerX) / radiusX;
+        const normalizedY = (dot.y - centerY) / radiusY;
+        const fieldFade = Math.max(0, 1 - Math.hypot(normalizedX, normalizedY));
+        const dx = dot.x - pointerX;
+        const dy = dot.y - pointerY;
+        const distance = Math.hypot(dx, dy);
+        const influence = reducedMotion.matches ? 0 : Math.max(0, 1 - distance / 165);
+        const push = influence * 28;
+        const targetX = distance ? (dx / distance) * push : 0;
+        const targetY = distance ? (dy / distance) * push : 0;
+
+        dot.offsetX += (targetX - dot.offsetX) * 0.22;
+        dot.offsetY += (targetY - dot.offsetY) * 0.22;
+        if (Math.abs(targetX - dot.offsetX) > 0.15 || Math.abs(targetY - dot.offsetY) > 0.15) stillMoving = true;
+
+        if (fieldFade > 0.025) {
+          const activeGlow = influence * 0.42;
+          dotContext.beginPath();
+          dotContext.arc(dot.x + dot.offsetX, dot.y + dot.offsetY, 1.5 + activeGlow, 0, Math.PI * 2);
+          dotContext.fillStyle = isDark
+            ? `rgba(255, 112, 82, ${(0.3 + activeGlow) * fieldFade})`
+            : `rgba(219, 54, 33, ${(0.34 + activeGlow) * fieldFade})`;
+          dotContext.fill();
+        }
+      });
+
+      if (stillMoving && !framePending) {
+        framePending = true;
+        window.requestAnimationFrame(drawDotField);
+      }
+    }
+
+    function moveDotField(event) {
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      if (!framePending) {
+        framePending = true;
+        window.requestAnimationFrame(drawDotField);
+      }
+    }
+
+    window.addEventListener('pointermove', moveDotField, { passive: true });
+    window.addEventListener('pointerleave', () => {
+      pointerX = -1000;
+      pointerY = -1000;
+      if (!framePending) {
+        framePending = true;
+        window.requestAnimationFrame(drawDotField);
+      }
+    });
+    window.addEventListener('resize', resizeDotField, { passive: true });
+    reducedMotion.addEventListener?.('change', drawDotField);
+    resizeDotField();
+  }
+
+  // Let the decorative technology marks hop to a nearby spot when activated.
+  const watermarkIcons = [...document.querySelectorAll('.tech-watermarks img, .tech-watermarks svg')];
+  const bubbleHopHandlers = new Map();
+  watermarkIcons.forEach((icon) => {
+    const iconName = [...icon.classList]
+      .find((className) => className.startsWith('watermark-'))
+      ?.replace('watermark-', '') || 'technology';
+    icon.setAttribute('role', 'button');
+    icon.setAttribute('aria-label', `Move ${iconName} background icon`);
+    icon.setAttribute('tabindex', '0');
+    icon.setAttribute('title', `Click to move ${iconName}`);
+
+    function bubbleHop() {
+      if (icon._bubbleHop?.playState === 'running') return;
+
+      const currentX = Number(icon.dataset.bubbleX || 0);
+      const currentY = Number(icon.dataset.bubbleY || 0);
+      const targetX = Math.round((Math.random() * 2 - 1) * 58);
+      const targetY = Math.round((Math.random() * 2 - 1) * 52);
+      const arcX = Math.round((Math.random() * 2 - 1) * 22);
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || typeof icon.animate !== 'function') {
+        icon.dataset.bubbleX = String(targetX);
+        icon.dataset.bubbleY = String(targetY);
+        icon.style.translate = `${targetX}px ${targetY}px`;
+        return;
+      }
+
+      icon._bubbleHop = icon.animate([
+        { translate: `${currentX}px ${currentY}px`, scale: 1, offset: 0 },
+        { translate: `${targetX + arcX}px ${targetY - 34}px`, scale: 1.24, offset: 0.38 },
+        { translate: `${targetX}px ${targetY}px`, scale: 1, offset: 1 }
+      ], {
+        duration: 850,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+      });
+
+      icon._bubbleHop.onfinish = () => {
+        icon.dataset.bubbleX = String(targetX);
+        icon.dataset.bubbleY = String(targetY);
+        icon.style.translate = `${targetX}px ${targetY}px`;
+        icon._bubbleHop.cancel();
+      };
+    }
+
+    bubbleHopHandlers.set(icon, bubbleHop);
+    icon.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        bubbleHop();
+      }
+    });
+  });
+
+  // The page content is layered above the decorative background, so catch
+  // clicks on the icons' visible positions before that content handles them.
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('a, button, input, textarea, select, [role="button"]')) return;
+    const icon = watermarkIcons.find((candidate) => {
+      const bounds = candidate.getBoundingClientRect();
+      return event.clientX >= bounds.left && event.clientX <= bounds.right
+        && event.clientY >= bounds.top && event.clientY <= bounds.bottom;
+    });
+    if (icon) bubbleHopHandlers.get(icon)?.();
+  }, true);
+
   // Ensure PORTFOLIO_DATA is loaded
   if (typeof PORTFOLIO_DATA === 'undefined') {
     console.error('PORTFOLIO_DATA failed to load!');

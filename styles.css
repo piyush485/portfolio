@@ -85,6 +85,8 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 88px;
+  scrollbar-color: var(--db-lava) var(--db-navy-900);
+  scrollbar-width: thin;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -104,6 +106,15 @@ body {
     radial-gradient(circle at 15% 15%, rgba(255, 54, 33, 0.04) 0%, transparent 40%),
     radial-gradient(circle at 85% 70%, rgba(2, 132, 199, 0.03) 0%, transparent 45%);
   background-attachment: fixed;
+}
+
+.cursor-dot-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* Quiet, animated data streams tie the page background to the hero cover. */
@@ -189,11 +200,12 @@ p, li, .hero-subtitle, .section-desc, .drawer-desc, .skill-desc, .project-desc, 
   background: var(--db-navy-900);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--db-navy-500);
+  background: var(--db-lava);
   border-radius: 4px;
+  border: 2px solid var(--db-navy-900);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--db-lava);
+  background: var(--db-lava-hover);
 }
 
 /* Databricks Signature Dotted Grid Matrix Watermark */
@@ -433,6 +445,21 @@ button {
   grid-template-columns: 1.1fr 0.9fr;
   gap: 40px;
   align-items: center;
+}
+.hero-copy-content {
+  position: relative;
+  isolation: isolate;
+}
+.hero-copy-content::before {
+  content: "";
+  position: absolute;
+  inset: -18px -20px;
+  z-index: -1;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--db-navy-900) 78%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
 }
 .hero-tag {
   display: flex;
@@ -1643,16 +1670,44 @@ button {
   pointer-events: none;
   z-index: 0;
   color: var(--db-text-dim);
-  opacity: 0.12;
+  opacity: 0.2;
 }
-[data-theme="dark"] .tech-watermarks { opacity: 0.28; }
+[data-theme="dark"] .tech-watermarks { opacity: 0.32; }
 .tech-watermarks img, .tech-watermarks svg {
   position: absolute;
   display: block;
   width: 64px;
   height: 64px;
   object-fit: contain;
-  filter: grayscale(1);
+  filter: saturate(0.72);
+  animation: watermark-drift var(--float-duration, 12s) ease-in-out var(--float-delay, 0s) infinite alternate;
+  will-change: transform;
+  pointer-events: auto;
+  cursor: grab;
+}
+.tech-watermarks img:active, .tech-watermarks svg:active { cursor: grabbing; }
+.tech-watermarks img:focus-visible, .tech-watermarks svg:focus-visible {
+  outline: 2px solid var(--db-lava);
+  outline-offset: 5px;
+  border-radius: 6px;
+}
+@keyframes watermark-drift {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate3d(var(--float-x), var(--float-y), 0) rotate(var(--float-rotate)) scale(1.08); }
+  100% { transform: translate3d(var(--float-end-x), var(--float-end-y), 0) rotate(var(--float-end-rotate)) scale(0.96); }
+}
+.watermark-databricks { --float-x: 24px; --float-y: -28px; --float-rotate: 9deg; --float-end-x: -16px; --float-end-y: 18px; --float-end-rotate: -6deg; --float-duration: 11s; --float-delay: -4s; }
+.watermark-python { --float-x: -28px; --float-y: 22px; --float-rotate: -10deg; --float-end-x: 18px; --float-end-y: -20px; --float-end-rotate: 7deg; --float-duration: 13s; --float-delay: -9s; }
+.watermark-sql { --float-x: 30px; --float-y: 20px; --float-rotate: -7deg; --float-end-x: -18px; --float-end-y: -24px; --float-end-rotate: 8deg; --float-duration: 12s; --float-delay: -6s; }
+.watermark-spark { --float-x: -22px; --float-y: -26px; --float-rotate: 11deg; --float-end-x: 26px; --float-end-y: 16px; --float-end-rotate: -8deg; --float-duration: 14s; --float-delay: -3s; }
+.watermark-aws { --float-x: 26px; --float-y: -20px; --float-rotate: -9deg; --float-end-x: -20px; --float-end-y: 24px; --float-end-rotate: 6deg; --float-duration: 10s; --float-delay: -8s; }
+.watermark-airflow { --float-x: -24px; --float-y: 26px; --float-rotate: 8deg; --float-end-x: 20px; --float-end-y: -18px; --float-end-rotate: -7deg; --float-duration: 13s; --float-delay: -5s; }
+.watermark-azure { --float-x: 20px; --float-y: -30px; --float-rotate: -10deg; --float-end-x: -26px; --float-end-y: 22px; --float-end-rotate: 7deg; --float-duration: 12s; --float-delay: -10s; }
+@media (prefers-reduced-motion: reduce) {
+  .tech-watermarks img, .tech-watermarks svg {
+    animation: none;
+    will-change: auto;
+  }
 }
 .watermark-databricks, .watermark-sql, .watermark-aws, .watermark-azure {
   left: max(20px, calc((100vw - 1240px) / 2 - 92px));
@@ -1705,8 +1760,8 @@ p, li, .hero-subtitle, .section-desc, .drawer-desc, .skill-desc,
 .navbar { border-bottom-color: color-mix(in srgb, var(--db-border) 72%, var(--db-lava)); }
 
 @media (max-width: 700px) {
-  .tech-watermarks { opacity: 0.07; }
-  [data-theme="dark"] .tech-watermarks { opacity: 0.17; }
+  .tech-watermarks { opacity: 0.14; }
+  [data-theme="dark"] .tech-watermarks { opacity: 0.23; }
   .tech-watermarks img, .tech-watermarks svg { width: 54px !important; height: 54px !important; }
   .watermark-databricks, .watermark-sql, .watermark-aws, .watermark-azure { left: -22px; }
   .watermark-python, .watermark-spark, .watermark-airflow { right: -22px; }
